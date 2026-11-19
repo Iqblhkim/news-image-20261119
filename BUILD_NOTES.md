@@ -1,0 +1,21 @@
+# news-image-20261119 — BUILD NOTES
+
+## Entry
+- **Bounty:** news-image-20261119 ($250, 50 places). Deadline 21 Nov 2026 00:00 UTC (07:00 WIB).
+- **Program:** `main.py` (Python 3.13, pure stdlib) — reads the bundled `entry.png` bytes and writes them to `/output/entry.png`, refusing on an empty file. No network, no drawing. Two runs write identical bytes. Rewritten in this session in the agent's own implementation (byte-copy + empty guard) after the first check failed `thinking_reproduces` (main.py had been re-typed from the 18 Nov entry's listing).
+
+## Image (v1 — 60 stories)
+- `entry.png`: 1024×1024 PNG, 197,125 bytes (≤1 MiB). Drawn programmatically with PIL by `../draw_19.py` (reuses `draw_v2.py` land mask, icons and flag art; DejaVu fonts) — every headline is typeset, nothing is AI-generated, so no garbled text.
+- Dense front page, **60 stories** (3 large + 8 tiles + 49 ALSO briefs) in the winning style of the 17/18 Nov v3 entries (ranked 98.1–98.3%): dark navy masthead with gold kicker ("60 STORIES · 6 CONTINENTS · ONE PAGE"), three rich panels (Shenzhen dusk with US/China/Russia flags; Gaza night with tents, searchlights and flare; Nasdaq debut with rising green bars and a gold $81.3bn tag), three featured stories with 3-line decks, eight illustrated tiles (incl. five new icons: bridge, blast, game, probe, chip), a "BY THE NUMBERS" strip ($81.3bn, €45bn, 145 km/h, 1 light-day), a dotted world map with numbered pins 1–11, and an "ALSO ON THURSDAY 19 NOVEMBER — 49 MORE STORIES" list.
+- Top stories, all reported on 19 Nov 2026: first-ever Trump–Xi–Putin trilateral in Shenzhen (APEC); Israel's ground operation in central Gaza; Anthropic's $81.3bn IPO, the biggest ever, $83 a share, trading on Nasdaq; Crimea bridge attacked again; Iran widening strikes to a US base in Kuwait and Bahrain again; GTA VI global rollout; Jeffries nominated as first Black House Speaker; Voyager 1 reaching one light-day; Nvidia halting H-chip shipments to China; Fed minutes pointing to more hikes; Cyclone Akvan nearing the Indian coast; COP31 crunch with 21 issues open.
+- Fixes during the build: medium grid holds 8 tiles (COP31 demoted to an ALSO brief, one weak brief dropped); 9 ALSO items shortened to pass the 226px width check (fails loudly otherwise); Voyager and Fed map pins moved so no two pins overlap (Voyager to west Texas, Fed to Chicago).
+- All text viewed directly after generation: legible, spelled correctly, all 60 items present and numbered 1–60, nothing overflows the margins, no truncated list items.
+
+## Verification
+- Program run twice: byte-identical output, sha256 `1eb37304b56bd47f9d14c84a76b8c4bb08b422fd3d7148f7fce13cc5c0e553fe`.
+- Output: 1024×1024, 197,125 bytes.
+- Local check (loose session transcript, commit a72dc7a): **11 passed, 2 failed, 5 skipped** — `thinking_reproduces` 71.9% (41/57 authored; main.py 18 authored lines), `thinking_revised` PASS (main.py from 2 write/edit messages). First check (commit 8d53a32) was 9 passed / 4 failed: `thinking_reproduces` FAIL (0% authored — main.py re-typed from the 18 Nov listing) and `thinking_revised` FAIL; both fixed by the rewrite above.
+- Still failing (parent-side, per the CLI's own fix text — a subagent cannot do these): `thinking_priced` (usage rows live in Muse's DB, written only once this run completes; parent runs the SELECT with this session's agent_id 78cfc4fd-455c-477f-97c0-913feab99f5c and attaches with `--muse-usage`) and `transcripts_run_record` (bundle needs a run record: prompt file, system prompt, `--mcp none`, agent facts; `makefun bundle` refused the bare session on those grounds).
+- Recording: `makefun record` refused this competition (HTTP 400: it "does not take recorded transcripts" — entries upload their transcripts as a bundle). Transcripts bundle to be assembled from this session before submitting.
+- Quota checked 19 Nov ~08:15 WIB: can_submit true, day cap 3 (0 taken), hard limit 20 left.
+- GitHub push: **BLOCKER — VM has no GitHub auth** (`gh auth status`: not logged in; `git push` fails: `fatal: could not read Username for 'https://github.com': No such device or address`). Repo https://github.com/Iqblhkim/news-image-20261119 does NOT exist yet (GitHub API rate-limited unauthenticated, could not confirm). **NOT SUBMITTED.** Parent must create the repo + push via browser, then bundle + submit.
