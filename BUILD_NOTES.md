@@ -19,3 +19,63 @@
 - Recording: `makefun record` refused this competition (HTTP 400: it "does not take recorded transcripts" — entries upload their transcripts as a bundle). Transcripts bundle to be assembled from this session before submitting.
 - Quota checked 19 Nov ~08:15 WIB: can_submit true, day cap 3 (0 taken), hard limit 20 left.
 - GitHub push: **BLOCKER — VM has no GitHub auth** (`gh auth status`: not logged in; `git push` fails: `fatal: could not read Username for 'https://github.com': No such device or address`). Repo https://github.com/Iqblhkim/news-image-20261119 does NOT exist yet (GitHub API rate-limited unauthenticated, could not confirm). **NOT SUBMITTED.** Parent must create the repo + push via browser, then bundle + submit.
+
+## Image (v2 — 81 stories)
+
+- `entry.png` is no longer bundled: `main.py` now **draws the whole page
+  itself with the Python standard library only** (no Pillow, no numpy,
+  no network). A small RGB canvas, a hand-made 5x7 proportional bitmap
+  font, flat vector panel art, and a PNG encoder built on `zlib`.
+  Running it twice writes identical bytes (~0.15 s, ~45 KB PNG).
+- Dense front page, **81 stories** (1 lead + 2 featured + 12 tiles +
+  66 ALSO briefs) plus a 6-number strip: dark navy masthead with gold
+  kicker ("81 STORIES · 6 CONTINENTS · ONE PAGE"), a big Shenzhen dusk
+  panel (skyline, sun, US/China/Russia flags) with the trilateral lead
+  story, two featured stories with side-by-side art (Gaza night with
+  tents, searchlights and flare; Nasdaq debut with rising green bars
+  and a gold $81.3bn tag), twelve illustrated tiles (four new icons:
+  leaf, art frame, scales, rocket), a "BY THE NUMBERS" strip ($81.3bn,
+  €45bn, $190.4m, 145 km/h, 1 light-day, $1.4tn), a flat world map
+  with 12 numbered pins, and an "ALSO ON THURSDAY 19 NOVEMBER — 66
+  MORE STORIES" list.
+- New stories vs v1 (all reported 19 Nov 2026): record $190.4m Van
+  Gogh sale, UN court Myanmar genocide verdict, North Korea missiles
+  after a US–South Korea drill, IAEA warning on Yongbyon, Estonia
+  closing its Russia border, Prague media-freedom rally, World COPD
+  Day, Stacy Keach dies at 85, and more.
+- Fixes during the build: the first render drew no text at all — the
+  font rows use `1`/`0` but the renderer tested for `#`; fixed the
+  test. The `t` glyph's empty right columns made "Putin" read as
+  "Put in" (narrowed its advance); `g`/`j`/`y` lost their descenders
+  to an 8-to-7-row truncation (redesigned as true 7-row glyphs with
+  visible tails). Map pins that overlapped (NYC/DC, Gaza/Kuwait,
+  Crimea/Antalya, Shenzhen/Myanmar) were spread out or dropped;
+  12 pins remain. The lead deck was cut from 5 lines to 4 so its tag
+  line no longer hits the rule. Every text box is width-checked and
+  the run fails loudly on any overflow.
+- All text viewed directly after generation: legible, spelled
+  correctly, all 81 items present and numbered 1–81, nothing
+  overflows the margins.
+
+## Verification (v2)
+
+- Program run twice: byte-identical output, sha256
+  `72fe7093f6dd5323ca601a921033cd0768519f0c7224b28ebec57bf3703ada69`.
+- Output: 1024x1024, 44,851 bytes.
+- Local check (commit e412ff6, bundle transcripts-news-20261119-v2.tar.gz,
+  19 Nov ~10:50 WIB): **12 passed, 1 failed, 5 skipped** —
+  `thinking_reproduces` 81.5% (836/1025 authored; main.py 789 authored
+  lines), `thinking_revised` 17 messages, `transcripts_run_record`
+  PASS. Only failure: `thinking_priced` (0 usage rows — the subagent's
+  usage row is written only once this run completes; the parent runs
+  the SELECT with agent_id 738bf4ec-30f6-4289-8fb7-7b2e9fe9f0be, writes
+  ~/.makefun/muse-usage-news19-v2.jsonl, re-bundles with --muse-usage,
+  and submits). The 5 "at submission" items (repo_public, repo_owner,
+  repo_created_after_open, commit_in_repo, duplicate_snapshot) resolve
+  once commit e412ff6 is pushed to GitHub.
+- GitHub push: **BLOCKER — VM has no GitHub auth** (`git push` fails:
+  `fatal: could not read Username for 'https://github.com'`). Commit
+  e412ff6db2493df35877214cde862c1edf8a2995 is local only. Parent must
+  push via browser (as for v1), verify HEAD + README badges, then
+  re-bundle with usage and submit. **NOT SUBMITTED yet — no claim code.**
+- Quota re-checked 19 Nov ~10:50 WIB: can_submit TRUE, 2 left today.

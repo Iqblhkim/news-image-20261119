@@ -12,16 +12,18 @@ The image is a newspaper-style front page: the first-ever Trump–Xi–Putin
 trilateral in Shenzhen on the APEC sidelines, Israel's ground operation
 in central Gaza, Anthropic's record $81.3bn IPO (shares at $83, trading
 on Nasdaq), the Crimea bridge attacked again, Iran widening its strikes
-to a US base in Kuwait and Bahrain again, GTA VI's global rollout, and
-Voyager 1 reaching one light-day from Earth — 60 stories in all.
+to a US base in Kuwait and Bahrain again, GTA VI's global rollout, a
+record $190.4m Van Gogh sale, the UN court's Myanmar genocide verdict,
+and Voyager 1 reaching one light-day from Earth — 81 stories in all.
 
 ## Run
 
-The program writes the image deterministically, with no network:
+The program draws the image itself, with the Python standard library
+only — no network, no third-party packages:
 
 ```
 python3 main.py
 ```
 
-It copies the bundled image to `/output/entry.png` — running it twice
-writes the same bytes. The image is a 1024x1024 PNG under 1 MiB.
+It writes `/output/entry.png` — running it twice writes the same bytes.
+The image is a 1024x1024 PNG under 1 MiB.
