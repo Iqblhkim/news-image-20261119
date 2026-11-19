@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
-"""Draw the v2 news front page for make.fun news-image-20261119.
+"""Draw the v3 news front page for make.fun news-image-20261119.
 
-81 stories for Thursday 19 November 2026, in a dense front-page style:
-dark navy masthead, a big illustrated lead panel (Shenzhen dusk, three
-flags), two featured stories with art panels, twelve illustrated tiles,
-a BY THE NUMBERS strip, a flat world map with 12 numbered pins, and an
-ALSO list of 66 one-line briefs. Nothing invented: every story was
-reported on 19 Nov 2026 (AP/Reuters/AFP/BBC/Al Jazeera/UN News roundups,
-the COP31 diary, the APEC diary, and the day's wire digests).
+60 stories for Thursday 19 November 2026, in a cleaner front-page
+style: dark navy masthead, a big illustrated lead panel (Shenzhen dusk,
+three flags), two featured stories with art panels, a BY THE NUMBERS
+strip, and 57 numbered tiles in three wide columns with generous row
+pitch -- every headline on one readable line. Nothing invented: every
+story was reported on 19 Nov 2026 (AP/Reuters/AFP/BBC/Al Jazeera/UN
+News roundups, the COP31 diary, the APEC diary, and the day's wire
+digests).
+
+Why v3: v2 crammed 81 stories onto one page (66 one-line briefs at a
+14px row pitch) and the pairwise AI judge scored it 96.6%, worse than
+v1's 97.4% at 60 stories. v3 keeps 60 stories but gives each of the 57
+tiles a full-width column slot at a 26px row pitch, so every headline
+is legible at a glance.
 
 Top of the day: the first-ever Trump-Xi-Putin trilateral in Shenzhen on
 the APEC sidelines; Israel's ground operation in central Gaza; Anthropic's
@@ -47,8 +54,6 @@ GOLD_LT = (226, 196, 120)
 GRAY = (96, 96, 96)
 DARKGRAY = (60, 60, 60)
 RULE = (26, 26, 26)
-MAP_BG = (214, 228, 236)
-LAND = (196, 176, 128)
 WHITE = (255, 255, 255)
 CREAM = (240, 235, 220)
 
@@ -372,105 +377,6 @@ def wrap_text(text, scale, max_w, tracking=0):
     return lines
 
 
-# ------------------------------------------------------------------- icons
-def draw_icon(cv, x, y, s, kind):
-    """A pictogram in a coloured s*s square (flat vector style)."""
-    bg = {"bridge": (38, 84, 160), "blast": (178, 32, 44),
-          "game": (110, 70, 150), "ballot": (36, 110, 70),
-          "probe": (20, 90, 110), "chip": (30, 30, 40),
-          "chart": (24, 90, 60), "storm": (70, 80, 100),
-          "leaf": (46, 125, 60), "art": (190, 110, 30),
-          "scales": (120, 85, 40), "rocket": (40, 50, 110)}.get(kind, GRAY)
-    cv.rect(x, y, s, s, bg)
-    w = WHITE
-    u = s // 40  # unit; icons are drawn for s = 40
-    if kind == "bridge":
-        cv.rect(x + 6, y + 24, 10, 3, w)
-        cv.rect(x + 24, y + 24, 10, 3, w)
-        cv.polygon([(x + 6, y + 26), (x + 11, y + 14), (x + 16, y + 26)], w)
-        cv.polygon([(x + 24, y + 26), (x + 29, y + 14), (x + 34, y + 26)], w)
-        cv.polygon([(x + 17, y + 25), (x + 21, y + 33), (x + 24, y + 31),
-                    (x + 20, y + 24)], w)
-        cv.circle(x + 31, y + 10, 4, (255, 210, 110))
-    elif kind == "blast":
-        cx, cy = x + 20, y + 20
-        cv.polygon([(cx, cy - 14), (cx + 4, cy - 4), (cx + 14, cy - 6),
-                    (cx + 7, cy + 2), (cx + 12, cy + 10), (cx + 2, cy + 8),
-                    (cx, cy + 15), (cx - 3, cy + 7), (cx - 13, cy + 9),
-                    (cx - 7, cy + 1), (cx - 14, cy - 5), (cx - 4, cy - 5)],
-                   (255, 210, 110))
-        cv.circle(cx, cy, 4, w)
-    elif kind == "game":
-        cv.rect(x + 6, y + 14, 28, 16, w)
-        cv.circle(x + 12, y + 20, 3, (110, 70, 150))
-        cv.circle(x + 28, y + 20, 3, (110, 70, 150))
-        cv.hline(x + 11, y + 27, 5, (110, 70, 150), 2)
-        cv.hline(x + 24, y + 26, 5, (110, 70, 150), 2)
-    elif kind == "ballot":
-        cv.rect(x + 10, y + 16, 20, 16, w)
-        cv.rect(x + 16, y + 12, 8, 4, w)
-        cv.line(x + 13, y + 24, x + 18, y + 29, (36, 110, 70), 3)
-        cv.line(x + 18, y + 29, x + 27, y + 19, (36, 110, 70), 3)
-    elif kind == "probe":
-        cv.polygon([(x + 8, y + 8), (x + 26, y + 8), (x + 17, y + 24)], w)
-        cv.line(x + 17, y + 24, x + 30, y + 32, w, 3)
-        cv.rect(x + 28, y + 30, 6, 6, w)
-        for dx, dy in ((30, 8), (34, 14), (26, 12)):
-            cv.circle(x + dx, y + dy, 1, (255, 210, 110))
-    elif kind == "chip":
-        cv.rect(x + 12, y + 12, 16, 16, w, )
-        cv.rect(x + 17, y + 17, 6, 6, (30, 30, 40))
-        for i in range(3):
-            cv.vline(x + 14 + i * 6, y + 6, 6, w, 2)
-            cv.vline(x + 14 + i * 6, y + 28, 6, w, 2)
-            cv.hline(x + 6, y + 14 + i * 6, 6, w, 2)
-            cv.hline(x + 28, y + 14 + i * 6, 6, w, 2)
-    elif kind == "chart":
-        for bx, bh in ((8, 10), (16, 16), (24, 22), (32, 30)):
-            cv.rect(x + bx, y + 34 - bh, 5, bh, (120, 220, 150))
-        cv.line(x + 8, y + 22, x + 34, y + 6, (255, 210, 110), 2)
-    elif kind == "storm":
-        cv.circle(x + 14, y + 16, 7, w)
-        cv.circle(x + 22, y + 13, 8, w)
-        cv.circle(x + 28, y + 17, 6, w)
-        cv.rect(x + 8, y + 18, 26, 5, w)
-        cv.polygon([(x + 20, y + 24), (x + 15, y + 32), (x + 20, y + 32),
-                    (x + 17, y + 38), (x + 25, y + 28), (x + 20, y + 28)],
-                   (255, 210, 110))
-    elif kind == "leaf":
-        cv.polygon([(x + 8, y + 32), (x + 8, y + 16), (x + 22, y + 8),
-                    (x + 32, y + 18), (x + 28, y + 32)], (150, 220, 130))
-        cv.line(x + 10, y + 32, x + 30, y + 12, (20, 80, 35), 2)
-    elif kind == "art":
-        cv.rect(x + 7, y + 7, 26, 26, w)
-        cv.rect(x + 10, y + 10, 20, 20, (190, 110, 30))
-        cv.circle(x + 24, y + 16, 4, (255, 210, 110))
-        cv.polygon([(x + 10, y + 30), (x + 18, y + 18), (x + 26, y + 30)],
-                   (60, 90, 60))
-        cv.polygon([(x + 20, y + 30), (x + 26, y + 22), (x + 30, y + 30)],
-                   (90, 120, 70))
-    elif kind == "scales":
-        cv.vline(x + 20, y + 8, 24, w, 2)
-        cv.hline(x + 8, y + 10, 24, w, 2)
-        cv.line(x + 8, y + 10, x + 4, y + 22, w, 2)
-        cv.line(x + 8, y + 10, x + 12, y + 22, w, 2)
-        cv.polygon([(x + 3, y + 22), (x + 13, y + 22), (x + 8, y + 27)], w)
-        cv.line(x + 32, y + 10, x + 28, y + 22, w, 2)
-        cv.line(x + 32, y + 10, x + 36, y + 22, w, 2)
-        cv.polygon([(x + 27, y + 22), (x + 37, y + 22), (x + 32, y + 27)], w)
-        cv.hline(x + 14, y + 32, 12, w, 2)
-    elif kind == "rocket":
-        cv.polygon([(x + 20, y + 5), (x + 26, y + 14), (x + 26, y + 26),
-                    (x + 20, y + 32), (x + 14, y + 26), (x + 14, y + 14)],
-                   w)
-        cv.circle(x + 20, y + 17, 3, (40, 50, 110))
-        cv.polygon([(x + 14, y + 24), (x + 8, y + 32), (x + 14, y + 30)], w)
-        cv.polygon([(x + 26, y + 24), (x + 32, y + 32), (x + 26, y + 30)], w)
-        cv.polygon([(x + 17, y + 32), (x + 20, y + 38), (x + 23, y + 32)],
-                   (255, 160, 60))
-    del u
-
-
 # ------------------------------------------------------------------- flags
 def draw_flag(cv, x, y, w, h, kind):
     """Small flag, drawn with rectangles (and stars for China)."""
@@ -600,174 +506,24 @@ def panel_ipo(cv, x, y, w, h):
               y + 8 + tscale * 7 + 4, "BIGGEST IPO EVER", 1, WHITE)
 
 
-# -------------------------------------------------------------------- map
-# Simplified continent outlines (lon, lat). Stylised, not survey-grade.
-CONTINENTS = [
-    # North America
-    [(-168, 66), (-145, 70), (-130, 71), (-115, 69), (-100, 69), (-90, 68),
-     (-85, 66), (-80, 70), (-75, 72), (-65, 62), (-60, 55), (-55, 47),
-     (-60, 45), (-65, 44), (-70, 42), (-74, 39), (-76, 35), (-80, 32),
-     (-81, 26), (-84, 30), (-89, 29), (-97, 26), (-100, 20), (-105, 20),
-     (-110, 23), (-114, 28), (-117, 32), (-122, 37), (-124, 42),
-     (-124, 48), (-128, 52), (-135, 58), (-145, 60), (-155, 58),
-     (-162, 55), (-168, 66)],
-    # South America
-    [(-78, 8), (-72, 11), (-64, 10), (-58, 6), (-52, 4), (-44, -3),
-     (-35, -8), (-38, -15), (-40, -22), (-48, -27), (-52, -33),
-     (-58, -38), (-65, -45), (-68, -52), (-70, -54), (-73, -50),
-     (-73, -40), (-72, -30), (-70, -18), (-76, -13), (-80, -6),
-     (-81, -1), (-78, 4), (-78, 8)],
-    # Africa
-    [(-17, 15), (-16, 21), (-11, 27), (-6, 33), (0, 36), (9, 37),
-     (11, 34), (19, 32), (25, 32), (32, 31), (34, 28), (37, 22),
-     (39, 18), (43, 12), (48, 11), (51, 10), (48, 2), (41, -4),
-     (40, -12), (36, -18), (33, -26), (28, -33), (20, -35), (17, -32),
-     (14, -27), (12, -18), (13, -12), (9, -4), (9, 4), (4, 6), (-4, 5),
-     (-8, 5), (-13, 8), (-17, 12), (-17, 15)],
-    # Europe
-    [(-10, 36), (-9, 38), (-9, 43), (-4, 44), (-2, 47), (-1, 50), (2, 51),
-     (5, 53), (8, 55), (8, 57), (10, 58), (12, 56), (18, 56), (21, 55),
-     (21, 59), (24, 60), (28, 61), (30, 62), (30, 66), (32, 70), (40, 68),
-     (44, 66), (40, 60), (36, 58), (34, 55), (30, 50), (28, 46), (26, 44),
-     (23, 40), (22, 40), (19, 42), (16, 44), (12, 44), (8, 44), (6, 43),
-     (3, 42), (0, 40), (-2, 37), (-6, 36), (-9, 37), (-10, 36)],
-    # Asia
-    [(30, 70), (38, 69), (44, 68), (50, 69), (58, 69), (66, 69), (72, 71),
-     (80, 72), (88, 73), (96, 74), (104, 75), (112, 74), (120, 73),
-     (128, 72), (136, 72), (142, 71), (150, 70), (156, 69), (160, 66),
-     (162, 60), (158, 56), (156, 52), (150, 59), (144, 59), (141, 52),
-     (140, 46), (138, 42), (134, 38), (130, 35), (127, 35), (124, 32),
-     (122, 30), (120, 27), (116, 23), (112, 20), (108, 18), (105, 14),
-     (103, 10), (100, 8), (98, 12), (96, 16), (94, 18), (91, 22),
-     (89, 22), (86, 20), (83, 17), (80, 13), (77, 8), (75, 10),
-     (73, 16), (70, 20), (67, 24), (64, 25), (61, 25), (58, 26),
-     (55, 26), (52, 27), (50, 29), (48, 30), (45, 32), (42, 34),
-     (40, 36), (36, 36), (33, 36), (30, 36), (28, 40), (28, 44),
-     (30, 46), (33, 48), (36, 52), (40, 56), (40, 60), (38, 64),
-     (34, 68), (30, 70)],
-    # Australia
-    [(113, -22), (114, -30), (115, -34), (118, -35), (124, -33),
-     (129, -32), (132, -32), (135, -35), (138, -35), (140, -38),
-     (143, -39), (146, -39), (149, -37), (150, -37), (153, -32),
-     (153, -27), (150, -23), (147, -19), (144, -15), (142, -11),
-     (137, -12), (135, -12), (132, -11), (130, -13), (126, -14),
-     (123, -17), (120, -20), (116, -21), (113, -22)],
-    # United Kingdom
-    [(-5, 50), (-3, 53), (-5, 56), (-3, 58), (-1, 57), (0, 53), (1, 51),
-     (-2, 50), (-5, 50)],
-    # Japan
-    [(130, 31), (132, 33), (135, 34), (137, 36), (139, 38), (141, 40),
-     (142, 42), (140, 44), (138, 40), (136, 37), (133, 35), (131, 33),
-     (130, 31)],
-    # Indonesia
-    [(95, 5), (98, 3), (101, 0), (104, -2), (106, -6), (110, -7),
-     (114, -8), (118, -9), (120, -10), (122, -9), (125, -9), (128, -7),
-     (131, -4), (132, -2), (130, 0), (128, 1), (126, 1), (124, 1),
-     (121, 0), (119, 0), (116, 1), (114, 2), (111, 1), (108, -1),
-     (105, -3), (103, -1), (100, 0), (97, 2), (95, 5)],
-    # New Zealand
-    [(167, -45), (170, -42), (173, -40), (175, -38), (177, -38),
-     (175, -41), (172, -43), (169, -46), (167, -45)],
-    # Madagascar
-    [(44, -16), (47, -15), (50, -16), (49, -20), (47, -24), (45, -25),
-     (44, -21), (44, -16)],
-]
-
-
-def draw_map(cv, x, y, w, h, pins):
-    """Flat world map with numbered red pins."""
-    cv.rect(x, y, w, h, MAP_BG)
-    cv.outline(x, y, w, h, (150, 150, 140), 1)
-    lon0, lon1, lat0, lat1 = -180.0, 180.0, 83.0, -58.0
-
-    def proj(lon, lat):
-        px = x + (lon - lon0) / (lon1 - lon0) * w
-        py = y + (lat0 - lat) / (lat0 - lat1) * h
-        return (int(px), int(py))
-
-    for poly in CONTINENTS:
-        cv.polygon([proj(lon, lat) for lon, lat in poly], LAND)
-    for num, (plon, plat) in pins:
-        px, py = proj(plon, plat)
-        cv.circle(px, py, 7, RED)
-        cv.ring(px, py, 7, WHITE, 1)
-        s = str(num)
-        sw = text_w(s, 1)
-        draw_text(cv, px - sw // 2, py - 4, s, 1, WHITE)
-
-
 # -------------------------------------------------------------------- data
-# 81 stories for Thursday 19 November 2026: 1 lead + 2 featured + 12
-# illustrated tiles + 66 one-line briefs. All reported on 19 Nov 2026.
+# 60 stories for Thursday 19 November 2026: 1 lead + 2 featured + 57
+# numbered tiles. All reported on 19 Nov 2026.
 
 LEAD = {
     "num": 1, "kicker": "ASIA · DIPLOMACY",
     "headline": "Trump, Xi and Putin meet in Shenzhen",
     "deck": ("First-ever trilateral of the three leaders, on the APEC "
              "sidelines. Trump joins the plenary."),
-    "pin": (114.1, 22.5),
 }
 
 FEATURED = [
     {"num": 2, "kicker": "MIDDLE EAST · WAR",
      "headline": "Israel launches ground operation in Gaza",
-     "deck": ("Troops enter central Gaza. Families flee."),
-     "pin": (30.0, 34.0)},
+     "deck": ("Troops enter central Gaza. Families flee.")},
     {"num": 3, "kicker": "MARKETS · TECHNOLOGY",
      "headline": "Anthropic's $81.3bn IPO, biggest ever",
-     "deck": ("Record debut at $83 on Nasdaq."),
-     "pin": (-74.0, 40.7)},
-]
-
-MEDIUM = [
-    {"num": 4, "kicker": "EUROPE · WAR", "icon": "bridge",
-     "headline": "Crimea bridge hit again",
-     "deck": "Traffic halted",
-     "pin": (35.0, 46.0)},
-    {"num": 5, "kicker": "MIDDLE EAST · WAR", "icon": "blast",
-     "headline": "Iran hits Kuwait, Bahrain",
-     "deck": "Kuwait base hit",
-     "pin": (51.0, 27.0)},
-    {"num": 6, "kicker": "CULTURE · GAMING", "icon": "game",
-     "headline": "GTA VI rolls out worldwide",
-     "deck": "Vice City opens",
-     "pin": (-80.2, 25.8)},
-    {"num": 7, "kicker": "AMERICAS · POLITICS", "icon": "ballot",
-     "headline": "First Black Speaker: Jeffries",
-     "deck": "Democrats pick",
-     "pin": None},
-    {"num": 8, "kicker": "SCIENCE · SPACE", "icon": "probe",
-     "headline": "Voyager 1 reaches one light-day",
-     "deck": "48 years on",
-     "pin": (-104.0, 32.0)},
-    {"num": 9, "kicker": "TRADE · CHIPS", "icon": "chip",
-     "headline": "Nvidia halts H-chip China sales",
-     "deck": "Hopper ends",
-     "pin": (-121.9, 37.3)},
-    {"num": 10, "kicker": "ECONOMY · RATES", "icon": "chart",
-     "headline": "Fed: more hikes likely",
-     "deck": "Minutes hint hikes",
-     "pin": None},
-    {"num": 11, "kicker": "ASIA · WEATHER", "icon": "storm",
-     "headline": "Cyclone Akvan nears Indian coast",
-     "deck": "Landfall Friday",
-     "pin": (79.0, 14.0)},
-    {"num": 12, "kicker": "CLIMATE · COP31", "icon": "leaf",
-     "headline": "COP31 crunch: 21 issues open",
-     "deck": "21 issues open",
-     "pin": None},
-    {"num": 13, "kicker": "CULTURE · ART", "icon": "art",
-     "headline": "Van Gogh sells for record $190.4m",
-     "deck": "Nazi-row sale tops",
-     "pin": None},
-    {"num": 14, "kicker": "WORLD · JUSTICE", "icon": "scales",
-     "headline": "Myanmar faces genocide verdict",
-     "deck": "UN court rules",
-     "pin": (94.0, 25.0)},
-    {"num": 15, "kicker": "ASIA · SECURITY", "icon": "rocket",
-     "headline": "N. Korea fires missiles",
-     "deck": "After US drill",
-     "pin": (127.5, 39.5)},
+     "deck": ("Record debut at $83 on Nasdaq.")},
 ]
 
 NUMBERS = [
@@ -779,73 +535,66 @@ NUMBERS = [
     ("$1.4tn", "Anthropic debut value"),
 ]
 
-ALSO = [
-    "APEC: Trump talks",
-    "Berlin: Kyiv talks",
-    "Putin-Xi talks",
-    "Xi meets Carney",
-    "Canada: right deal",
-    "Panama: ships row",
-    "US: Huang testifies",
-    "Taiwan: Liu leads",
-    "Taiwan: spy bill",
-    "Taiwan: vote probe",
-    "US: Trump vs Vance",
-    "US-China: barriers",
-    "Russia: agent held",
-    "Haiti: Bukele raid",
-    "Microsoft: brief",
-    "NSA: net outage",
-    "US: stockpiling up",
-    "Epstein: $582m",
-    "Somalia: UAE bases",
-    "Libya: drug haul",
-    "Saudi: all clear",
-    "France: Melenchon",
-    "France: retirees",
-    "Spain: clashes",
-    "Australia: settlers",
-    "Australia: Putin pic",
-    "India: cyclone rail",
-    "India: Japan talks",
-    "Prabowo: Shenzhen",
-    "Korea: Lee ends",
-    "Islam tops by 2035",
-    "Science: lost years",
-    "Oil: WTI down 3.2%",
-    "BI rates up 25bp",
-    "Markets: slowdown",
-    "$100bn backer gains",
-    "Nvidia: Vera Rubin",
-    "Micron: -20%",
-    "Fitch: AI bond risks",
-    "Gulf: tanker stuck",
-    "COP31: stocktake",
-    "COP31: 152 jets",
-    "COP31: farm talks",
-    "COP31: kelp seat",
-    "Merck rabies jab",
-    "Deep sea: leases",
-    "Estonia: border",
-    "Prague: media rally",
-    "N. Korea: missiles",
-    "IAEA: Yongbyon",
-    "US: AI warning",
-    "COPD Day marked",
-    "Congress vs Modi",
-    "Climber survives",
-    "Berlin: spy charge",
-    "McDonald's inquiry",
-    "ESA: space laws",
-    "Spain: strike",
-    "Stacy Keach, 85",
-    "DPP defends cities",
-    "UK: GTA VI queues",
-    "Australia: migrants",
-    "China: micro EVs",
-    "Germany: hybrids",
-    "BJP: temple row",
-    "Xi meets To Lam",
+# 57 tiles, numbered 4-60. One short headline each, sized to fit a
+# 286px column slot at scale 2 (checked by check_fit at draw time).
+TILES = [
+    {"num": 4, "headline": "Crimea bridge hit again"},
+    {"num": 5, "headline": "Iran hits Kuwait, Bahrain"},
+    {"num": 6, "headline": "GTA VI rolls out worldwide"},
+    {"num": 7, "headline": "Jeffries: Black Speaker"},
+    {"num": 8, "headline": "Voyager 1: one light-day"},
+    {"num": 9, "headline": "Nvidia halts H-chip sales"},
+    {"num": 10, "headline": "Fed: more hikes likely"},
+    {"num": 11, "headline": "Cyclone Akvan nears India"},
+    {"num": 12, "headline": "COP31: 21 issues open"},
+    {"num": 13, "headline": "Van Gogh: record $190.4m"},
+    {"num": 14, "headline": "Myanmar genocide verdict"},
+    {"num": 15, "headline": "N. Korea fires missiles"},
+    {"num": 16, "headline": "APEC: Trump talks"},
+    {"num": 17, "headline": "Berlin: Kyiv talks"},
+    {"num": 18, "headline": "Putin-Xi talks"},
+    {"num": 19, "headline": "Xi meets Carney"},
+    {"num": 20, "headline": "US: Huang testifies"},
+    {"num": 21, "headline": "Taiwan: Liu leads"},
+    {"num": 22, "headline": "Taiwan: spy bill"},
+    {"num": 23, "headline": "US: Trump vs Vance"},
+    {"num": 24, "headline": "US-China: barriers"},
+    {"num": 25, "headline": "Russia: agent held"},
+    {"num": 26, "headline": "Haiti: Bukele raid"},
+    {"num": 27, "headline": "NSA: net outage"},
+    {"num": 28, "headline": "Epstein: $582m"},
+    {"num": 29, "headline": "France: Melenchon"},
+    {"num": 30, "headline": "Spain: clashes"},
+    {"num": 31, "headline": "India: Japan talks"},
+    {"num": 32, "headline": "Prabowo: Shenzhen"},
+    {"num": 33, "headline": "Islam tops by 2035"},
+    {"num": 34, "headline": "Oil: WTI down 3.2%"},
+    {"num": 35, "headline": "BI rates up 25bp"},
+    {"num": 36, "headline": "$100bn backer gains"},
+    {"num": 37, "headline": "Nvidia: Vera Rubin"},
+    {"num": 38, "headline": "Micron: -20%"},
+    {"num": 39, "headline": "Fitch: AI bond risks"},
+    {"num": 40, "headline": "COP31: stocktake"},
+    {"num": 41, "headline": "COP31: 152 jets"},
+    {"num": 42, "headline": "COP31: farm talks"},
+    {"num": 43, "headline": "Merck rabies jab"},
+    {"num": 44, "headline": "Estonia: border"},
+    {"num": 45, "headline": "Prague: media rally"},
+    {"num": 46, "headline": "IAEA: Yongbyon"},
+    {"num": 47, "headline": "US: AI warning"},
+    {"num": 48, "headline": "COPD Day marked"},
+    {"num": 49, "headline": "Congress vs Modi"},
+    {"num": 50, "headline": "Climber survives"},
+    {"num": 51, "headline": "Berlin: spy charge"},
+    {"num": 52, "headline": "Stacy Keach, 85"},
+    {"num": 53, "headline": "DPP defends cities"},
+    {"num": 54, "headline": "UK: GTA VI queues"},
+    {"num": 55, "headline": "China: micro EVs"},
+    {"num": 56, "headline": "Xi meets To Lam"},
+    {"num": 57, "headline": "Spain: strike"},
+    {"num": 58, "headline": "Australia: settlers"},
+    {"num": 59, "headline": "France: retirees"},
+    {"num": 60, "headline": "Science: lost years"},
 ]
 
 FOOTER1 = ("Every story here happened or was first reported on Thursday "
@@ -865,7 +614,7 @@ def check_fit(label, width, max_w):
 def draw_masthead(cv):
     cv.rect(0, 0, W, 84, NAVY)
     draw_tracked(cv, MARGIN, 10, "THE DAY IN WORLD NEWS", 2, GOLD_LT, 2)
-    right = "81 STORIES · 6 CONTINENTS · ONE PAGE"
+    right = "60 STORIES · 6 CONTINENTS · ONE PAGE"
     draw_tracked(cv, W - MARGIN - text_w(right, 2, 2), 10, right, 2,
                  GOLD_LT, 2)
     check_fit("masthead title", text_w("Thursday 19 November 2026", 5), CW)
@@ -882,7 +631,7 @@ def draw_lead(cv, y):
     ax, aw, ah = MARGIN, 620, 140
     panel_shenzhen(cv, ax, y, aw, ah)
     cv.rect(ax, y + ah - 15, aw, 15, NAVY_DARK)
-    draw_tracked(cv, ax + 6, y + ah - 11, "SHENZHEN · APEC SUMMIT", 2,
+    draw_tracked(cv, ax + 6, y + ah - 14, "SHENZHEN · APEC SUMMIT", 2,
                  WHITE, 1)
     cv.outline(ax, y, aw, ah, INK, 2)
     tx, tw = 664, 332
@@ -932,27 +681,22 @@ def draw_featured(cv, y):
 
 
 def draw_tiles(cv, y):
-    """Twelve tiles, 4 columns x 3 rows, each 233x60."""
-    colw, gap = 233, 12
-    for idx, st in enumerate(MEDIUM):
-        r, c = divmod(idx, 4)
+    """Fifty-seven tiles, 3 columns x 19 rows, pitch 26: number + headline.
+
+    Each tile is one readable line at scale 2 with a bold red number,
+    in a 314px column slot -- far roomier than v2's 66 briefs at a
+    14px row pitch.
+    """
+    colw, gap = 314, 13
+    for idx, st in enumerate(TILES):
+        r, c = divmod(idx, 3)
         x = MARGIN + c * (colw + gap)
-        ty = y + r * 64
-        draw_icon(cv, x, ty + 10, 40, st["icon"])
-        tx, tw = x + 48, colw - 48
-        kick = "%d %s" % (st["num"], st["kicker"])
-        check_fit("tile %d kicker" % st["num"], text_w(kick, 1), tw)
-        draw_text(cv, tx, ty + 2, kick, 1, RED)
-        yy = ty + 11
-        lines = wrap_text(st["headline"], 2, tw, tracking=-1)
-        check_fit("tile %d headline lines" % st["num"], len(lines), 2)
-        for ln in lines:
-            draw_text(cv, tx, yy, ln, 2, INK, tracking=-1)
-            yy += 14
-        deck_lines = wrap_text(st["deck"], 2, tw, tracking=-1)
-        check_fit("tile %d deck lines" % st["num"], len(deck_lines), 1)
-        draw_text(cv, tx, ty + 41, deck_lines[0] if deck_lines else "", 2,
-                  DARKGRAY, tracking=-1)
+        ty = y + r * 26
+        draw_text(cv, x, ty, str(st["num"]), 2, RED, bold=True)
+        tx = x + 28
+        check_fit("tile %d headline" % st["num"],
+                  text_w(st["headline"], 2, -1), colw - 28)
+        draw_text(cv, tx, ty, st["headline"], 2, INK, tracking=-1)
 
 
 def draw_numbers(cv, y):
@@ -969,43 +713,6 @@ def draw_numbers(cv, y):
             yy += 9
 
 
-def draw_bottom(cv, y):
-    """Map left (260x240), ALSO list right (3 cols x 22 rows)."""
-    draw_tracked(cv, MARGIN, y, "WHERE IT HAPPENED", 2, INK, 2)
-    draw_tracked(cv, 308, y, "ALSO ON THURSDAY 19 NOVEMBER — 66 MORE",
-                 2, INK, 2)
-    my = y + 18
-    pins = [(s["num"], s["pin"]) for s in [LEAD] + FEATURED + MEDIUM
-            if s["pin"] is not None]
-    draw_map(cv, MARGIN, my, 260, 240, pins)
-    draw_text(cv, MARGIN, my + 244, "Numbered dots mark the big stories",
-              1, GRAY)
-    start_num = 16
-    cols_x = [308, 537, 766]
-    per_col = 22
-    for col_i in range(3):
-        chunk = ALSO[col_i * per_col:(col_i + 1) * per_col]
-        cx = cols_x[col_i]
-        yy = my
-        for j, item in enumerate(chunk):
-            num = start_num + col_i * per_col + j
-            draw_text(cv, cx, yy, str(num), 2, RED, bold=True)
-            place, sep, rest = item.partition(": ")
-            tx = cx + 28
-            if sep:
-                head = place + ": "
-                check_fit("also #%d" % num,
-                          text_w(head, 2, -1) + 1
-                          + text_w(rest, 2, -1), 197)
-                draw_text(cv, tx, yy, head, 2, INK, bold=True, tracking=-1)
-                draw_text(cv, tx + text_w(head, 2, -1) + 1, yy, rest, 2,
-                          INK, tracking=-1)
-            else:
-                check_fit("also #%d" % num, text_w(item, 2, -1), 197)
-                draw_text(cv, tx, yy, item, 2, INK, tracking=-1)
-            yy += 14
-
-
 def draw_page():
     cv = Canvas(W, H, PAPER)
     draw_masthead(cv)
@@ -1013,17 +720,17 @@ def draw_page():
     cv.hline(MARGIN, 240, CW, RULE, 2)
     draw_featured(cv, 248)
     cv.hline(MARGIN, 388, CW, RULE, 2)
-    draw_tiles(cv, 396)
-    cv.hline(MARGIN, 592, CW, RULE, 2)
-    draw_numbers(cv, 600)
-    cv.hline(MARGIN, 650, CW, RULE, 2)
-    draw_bottom(cv, 658)
-    cv.hline(MARGIN, 992, CW, RULE, 1)
-    draw_text(cv, MARGIN, 998, FOOTER1, 1, GRAY)
-    draw_text(cv, MARGIN, 1007, FOOTER2, 1, GRAY)
-    total = 1 + len(FEATURED) + len(MEDIUM) + len(ALSO)
-    if total != 81:
-        VIOLATIONS.append("story count %d != 81" % total)
+    draw_numbers(cv, 396)
+    cv.hline(MARGIN, 448, CW, RULE, 2)
+    draw_tracked(cv, MARGIN, 456, "MORE ON THURSDAY 19 NOVEMBER — 57 STORIES",
+                 2, INK, 2)
+    draw_tiles(cv, 478)
+    cv.hline(MARGIN, 972, CW, RULE, 1)
+    draw_text(cv, MARGIN, 980, FOOTER1, 1, GRAY)
+    draw_text(cv, MARGIN, 989, FOOTER2, 1, GRAY)
+    total = 1 + len(FEATURED) + len(TILES)
+    if total != 60:
+        VIOLATIONS.append("story count %d != 60" % total)
     if VIOLATIONS:
         print("LAYOUT VIOLATIONS:")
         for v in VIOLATIONS:

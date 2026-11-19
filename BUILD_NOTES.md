@@ -79,3 +79,55 @@
   push via browser (as for v1), verify HEAD + README badges, then
   re-bundle with usage and submit. **NOT SUBMITTED yet — no claim code.**
 - Quota re-checked 19 Nov ~10:50 WIB: can_submit TRUE, 2 left today.
+
+## Image (v3 — 60 stories)
+
+- `main.py` rewritten in this session from the clean v2 file (the
+  cancelled v3 attempt's half-written main.py — truncated after
+  `wrap_text`, no story data, no `main()` — was discarded; v2 base
+  restored from commit e412ff6). Same pure-stdlib engine (RGB canvas,
+  5x7 bitmap font, flat vector panel art, zlib PNG encoder), new
+  layout: 1 lead + 2 featured + 57 tiles, NO map.
+- Why v3: v2 scored 96.6% (rank 2,348/3,598 at 11:04 WIB), WORSE than
+  v1's 97.4% — 81 stories crammed onto one page (66 briefs at a 14px
+  row pitch) lost pairwise judge matchups to cleaner pages. v3 keeps
+  60 stories like v1 but makes every tile readable: 3 columns x 19
+  rows at a 26px pitch, bold red number + one headline line at scale
+  2 in a 314px column slot (max 286px, enforced by check_fit).
+  Lead (Shenzhen trilateral), featured (Gaza, Anthropic IPO) and the
+  BY THE NUMBERS strip are unchanged from v2. One bug fixed from v2:
+  the lead caption "SHENZHEN · APEC SUMMIT" overflowed its bar by 3px
+  (text at y+ah-11); moved to y+ah-14.
+- 57 tiles (nos. 4-60): the 12 v2 medium stories first (headlines
+  shortened to fit one line: "Jeffries: Black Speaker", "Voyager 1:
+  one light-day", "Van Gogh: record $190.4m"), then 45 of v2's ALSO
+  briefs, verbatim.
+
+## Verification (v3)
+
+- Program run twice: byte-identical output, sha256
+  `ed9fe5ed14f5b5f54569325acb8c7029c367990041717f155b1cecf53ec36707`.
+- Output: 1024x1024, 33,148 bytes.
+- All text viewed directly after generation: masthead, lead, featured,
+  numbers strip and all 57 tiles legible, spelled correctly, numbered
+  4-60, nothing overflows the margins.
+- Local check (commit ad90318, bundle transcripts-news-20261119-v3.tar.gz
+  with sessions 43bbac24 [v3 builder] + 738bf4ec [v2 builder], 19 Nov
+  ~11:37 WIB): **12 passed, 1 failed, 5 skipped** —
+  `thinking_reproduces` **84.7%** (674/795 authored; main.py 575
+  authored lines), `thinking_revised` PASS (10 messages),
+  `transcripts_run_record` PASS (prompt "other", user's words
+  "Buat v3 50 berita / 60 gmbar" from prompt-user-v3.txt).
+  First check (bundle with v3 session only) FAILED reproduces at
+  13.3% — the engine re-typed from the v2 file counted as "read";
+  fixed by bundling the v2 builder session too, exactly as the CLI's
+  own fix text prescribes. First bundle attempt also failed the run
+  record (prompt-file was the agent brief, not the person's words;
+  fixed with prompt-user-v3.txt + origin "other"). Only failure left:
+  `thinking_priced` (0 usage rows — subagent rows are written only
+  once this run completes; parent runs the SELECT with agent_ids
+  43bbac24 + 738bf4ec and re-bundles with --muse-usage, as for v2).
+- GitHub push: **BLOCKER — VM has no GitHub auth.** Parent must push
+  via browser, verify HEAD + README badges, then re-bundle with usage
+  and submit. **NOT SUBMITTED yet — no claim code.**
+- Quota: news19 can_submit TRUE, 1 left today (checked 11:24 WIB).

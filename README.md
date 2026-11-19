@@ -14,7 +14,9 @@ in central Gaza, Anthropic's record $81.3bn IPO (shares at $83, trading
 on Nasdaq), the Crimea bridge attacked again, Iran widening its strikes
 to a US base in Kuwait and Bahrain again, GTA VI's global rollout, a
 record $190.4m Van Gogh sale, the UN court's Myanmar genocide verdict,
-and Voyager 1 reaching one light-day from Earth — 81 stories in all.
+and Voyager 1 reaching one light-day from Earth — 60 stories in all,
+in a cleaner v3 layout: three big stories up top, then 57 numbered
+tiles in three wide columns, every headline on one readable line.
 
 ## Run
 
